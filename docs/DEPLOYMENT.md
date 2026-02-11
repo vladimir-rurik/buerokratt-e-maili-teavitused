@@ -1,4 +1,4 @@
-# Deployment Guide
+# Juurutamise Juhend
 
 ## Prerequisites
 

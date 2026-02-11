@@ -1,8 +1,8 @@
-# Email Notification System Architecture
+# E-posti Teavitussüsteemi Arhitektuur
 
 ## System Overview
 
-The Email Notification System is designed to provide a reliable, scalable, and event-driven email delivery service for the Bürokraatt ecosystem. It follows the Bükstack DSL architecture principles and integrates seamlessly with existing services.
+Email Notification System on loodud pakkumaks usaldusväärset, skaleeritavat ja sündmuste-põhist e-posti kohaletoimetamise teenust Bürokraadi ökosüsteemile. See järgib Bükstack DSL arhitektuuri põhimõtteid ja integreerub sujuvalt olemasolevate teenustega.
 
 ## Architecture Diagram
 
@@ -50,9 +50,9 @@ The Email Notification System is designed to provide a reliable, scalable, and e
 
 ### 1. Email Notification Service
 
-**Technology:** Java 17, Spring Boot 3.x
+**Tehnoloogia:** Java 17, Spring Boot 3.x
 
-**Responsibilities:**
+**Kohustused:**
 - Accept email requests via REST API
 - Validate and enrich email data
 - Render email templates
@@ -61,7 +61,7 @@ The Email Notification System is designed to provide a reliable, scalable, and e
 - Track delivery status
 - Expose Prometheus metrics
 
-**Key Features:**
+**Peamised võimalused:**
 - JWT authentication via TIM
 - Rate limiting
 - Idempotency checks
@@ -70,12 +70,12 @@ The Email Notification System is designed to provide a reliable, scalable, and e
 
 ### 2. RabbitMQ Message Queues
 
-**Queues:**
+**Järjekorrad:**
 - **email.notifications** - Primary queue for email processing
 - **email.dlq** - Dead Letter Queue for failed messages
 - **email.retry** - Retry queue with exponential backoff
 
-**Features:**
+**Võimalused:**
 - Message TTL (Time To Live)
 - Priority queues
 - Persistent messages
@@ -84,12 +84,12 @@ The Email Notification System is designed to provide a reliable, scalable, and e
 
 ### 3. Email Providers
 
-**Supported Providers:**
+**Toetatud teenusepakkujad:**
 - **SMTP** - Standard SMTP servers
 - **AWS SES** - Amazon Simple Email Service
 - **SendGrid** - SendGrid API
 
-**Provider Abstraction:**
+**Teenusepakkuja abstraktsioon:**
 ```java
 public interface EmailProvider {
     EmailResult send(EmailMessage message) throws EmailException;
@@ -100,12 +100,12 @@ public interface EmailProvider {
 
 ### 4. Ruuter DSL Integration
 
-**Workflow Files:**
+**Töövoogu failid:**
 - `send-welcome-email.yml` - New user registration
 - `send-password-reset.yml` - Password reset requests
 - `send-chat-transfer-notification.yml` - Chat transfers
 
-**Example Workflow:**
+**Näide töövoost:**
 ```yaml
 prepare_email:
   assign:
@@ -125,7 +125,7 @@ send_email:
 
 ### 5. Database Schema (Resql Integration)
 
-**Tables:**
+**Tabelid:**
 - `email_deliveries` - Track all email delivery attempts
 - `email_templates` - Store email templates
 - `email_preferences` - User email preferences
@@ -133,20 +133,20 @@ send_email:
 
 ### 6. Monitoring & Observability
 
-**Metrics (Prometheus):**
+**Mõõdikud (Prometheus):**
 - `email_sent_total` - Total emails sent
 - `email_failed_total` - Total failures
 - `email_retry_total` - Retry attempts
 - `email_send_duration_seconds` - Send duration
 - `email_queue_size` - Queue depth
 
-**Logging (OpenSearch):**
+**Logimine (OpenSearch):**
 - Structured JSON logs
 - Event tracking
 - Error details
 - Performance metrics
 
-**Tracing (OpenTelemetry):**
+**Jälgimine (OpenTelemetry):**
 - Distributed tracing across services
 - Request correlation
 - Performance analysis
@@ -365,5 +365,3 @@ Ruuter DSL → HTTP Call → Email API → Queue → Provider
 - Error analysis
 - Queue monitoring
 - Provider status
-
-

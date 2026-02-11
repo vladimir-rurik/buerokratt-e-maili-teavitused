@@ -1,4 +1,4 @@
-# Monitoring and Alerting Guide
+# Monitooringu ja Häirete Juhend
 
 ## Metrics Endpoint
 
@@ -11,7 +11,7 @@ http://localhost:8085/actuator/prometheus
 ### Counter Metrics
 
 #### email_sent_total
-Total number of emails sent successfully.
+Edukalt saadetud e-kirjade koguarv.
 
 **Labels:**
 - `application` - Application name
@@ -24,7 +24,7 @@ email_sent_total{application="email-notification-service",provider="smtp",event_
 ```
 
 #### email_failed_total
-Total number of failed emails.
+Nurjunud e-kirjade koguarv.
 
 **Labels:**
 - `application` - Application name
@@ -37,7 +37,7 @@ email_failed_total{application="email-notification-service",event_type="user_reg
 ```
 
 #### email_retry_total
-Total number of email retry attempts.
+E-kirja korduskatsete koguarv.
 
 **Labels:**
 - `application` - Application name
@@ -51,7 +51,7 @@ email_retry_total{application="email-notification-service",event_type="user_regi
 ### Gauge Metrics
 
 #### email_queue_size
-Current size of email processing queue.
+E-kirja töötlemisjärjekorra praegune suurus.
 
 **Labels:**
 - `application` - Application name
@@ -64,7 +64,7 @@ email_queue_size{application="email-notification-service"} 234.0
 ### Histogram Metrics
 
 #### email_send_duration_seconds
-Email send duration in seconds.
+E-kirja saatmise kestus sekundites.
 
 **Labels:**
 - `application` - Application name
@@ -202,7 +202,7 @@ sum(rate(email_retry_total[5m])) / sum(rate(email_sent_total[5m]))
 
 ### Dashboard JSON
 
-Import this JSON into Grafana:
+Impordi see JSON Grafanasse:
 
 ```json
 {

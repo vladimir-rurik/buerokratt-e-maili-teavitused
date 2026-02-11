@@ -1,4 +1,4 @@
-# Email Notification System API Reference
+# E-posti Teavitussüsteemi API Referents
 
 ## Base URL
 
@@ -9,7 +9,7 @@ Development: http://localhost:8085
 
 ## Authentication
 
-All API endpoints require JWT authentication via TIM.
+Kõik API otspunktid nõuavad JWT autentimist TIMi kaudu.
 
 ```
 Authorization: Bearer <JWT_TOKEN>
@@ -19,9 +19,9 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### POST /email/send
 
-Send a single email notification.
+Saada üksik e-posti teavitus.
 
-**Request:**
+**Päring:**
 
 ```http
 POST /email/send HTTP/1.1
@@ -47,21 +47,21 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-**Request Fields:**
+**Päringuväljad:**
 
-| Field           | Type    | Required | Description                              |
-|-----------------|---------|----------|------------------------------------------|
-| eventId         | string  | No       | Unique event identifier (auto-generated if omitted) |
-| eventType       | string  | Yes      | Type of email event                      |
-| recipientEmail  | string  | Yes      | Recipient email address                  |
-| recipientName   | string  | No       | Recipient name for personalization       |
-| templateId      | string  | No       | Template identifier                      |
-| priority        | string  | No       | Priority: low, normal, high, critical (default: normal) |
-| locale          | string  | No       | Locale: et, en, ru (default: et)        |
-| templateData    | object  | No       | Data for template rendering              |
-| metadata        | object  | No       | Additional metadata for tracking         |
+| Väli           | Tüüp    | Kohustuslik | Kirjeldus                              |
+|-----------------|---------|-------------|------------------------------------------|
+| eventId         | string  | Ei          | Unique event identifier (auto-generated if omitted) |
+| eventType       | string  | Jah         | Type of email event                      |
+| recipientEmail  | string  | Jah         | Recipient email address                  |
+| recipientName   | string  | Ei          | Recipient name for personalization       |
+| templateId      | string  | Ei          | Template identifier                      |
+| priority        | string  | Ei          | Priority: low, normal, high, critical (default: normal) |
+| locale          | string  | Ei          | Locale: et, en, ru (default: et)        |
+| templateData    | object  | Ei          | Data for template rendering              |
+| metadata        | object  | Ei          | Additional metadata for tracking         |
 
-**Response (200 OK):**
+**Vastus (200 OK):**
 
 ```json
 {
@@ -71,7 +71,7 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-**Response (400 Bad Request):**
+**Vastus (400 Bad Request):**
 
 ```json
 {
@@ -81,9 +81,9 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### POST /email/send-batch
 
-Send multiple email notifications in batch.
+Saada mitu e-posti teavitist partis.
 
-**Request:**
+**Päring:**
 
 ```http
 POST /email/send-batch HTTP/1.1
@@ -104,7 +104,7 @@ Authorization: Bearer <JWT_TOKEN>
 ]
 ```
 
-**Response (200 OK):**
+**Vastus (200 OK):**
 
 ```json
 {
@@ -126,16 +126,16 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### GET /email/status/{messageId}
 
-Get delivery status for an email.
+Hangi e-posti kohaletoimetamise olek.
 
-**Request:**
+**Päring:**
 
 ```http
 GET /email/status/550e8400-e29b-41d4-a716-446655440000 HTTP/1.1
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Response (200 OK):**
+**Vastus (200 OK):**
 
 ```json
 {
@@ -150,7 +150,7 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-**Response (404 Not Found):**
+**Vastus (404 Not Found):**
 
 ```json
 {
@@ -160,16 +160,16 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### POST /email/retry/{messageId}
 
-Retry a failed email.
+Korda nurjunud e-kirja.
 
-**Request:**
+**Päring:**
 
 ```http
 POST /email/retry/550e8400-e29b-41d4-a716-446655440000 HTTP/1.1
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Response (200 OK):**
+**Vastus (200 OK):**
 
 ```json
 {
@@ -180,16 +180,16 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### DELETE /email/{messageId}
 
-Cancel a scheduled email.
+Tühista plaanitatud e-kiri.
 
-**Request:**
+**Päring:**
 
 ```http
 DELETE /email/550e8400-e29b-41d4-a716-446655440000 HTTP/1.1
 Authorization: Bearer <JWT_TOKEN>
 ```
 
-**Response (200 OK):**
+**Vastus (200 OK):**
 
 ```json
 {
@@ -198,7 +198,7 @@ Authorization: Bearer <JWT_TOKEN>
 }
 ```
 
-**Response (404 Not Found):**
+**Vastus (404 Not Found):**
 
 ```json
 {
@@ -208,15 +208,15 @@ Authorization: Bearer <JWT_TOKEN>
 
 ### GET /email/health
 
-Health check endpoint.
+Tervisekontrolli otspunkt.
 
-**Request:**
+**Päring:**
 
 ```http
 GET /email/health HTTP/1.1
 ```
 
-**Response (200 OK):**
+**Vastus (200 OK):**
 
 ```json
 {
@@ -249,7 +249,7 @@ GET /email/health HTTP/1.1
 
 ## Error Responses
 
-All errors follow this format:
+Kõik vead järgivad seda vormingut:
 
 ```json
 {
@@ -271,11 +271,11 @@ All errors follow this format:
 
 ## Rate Limiting
 
-Default limits per API key:
+Vaikimisi piirangud API võtme kohta:
 - 100 requests per minute
 - 1000 requests per hour
 
-Rate limit headers are included in responses:
+Rate limit headers on kaasatud vastustesse:
 
 ```
 X-RateLimit-Limit: 100

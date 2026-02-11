@@ -1,6 +1,6 @@
-# Email Notification System for Bürokraat
+# E-posti Teavitussüsteem Bürokraadile
 
-## Architecture
+## Arhitektuur
 
 ```
 ┌─────────────────────────────────────────────────────────────────┐
@@ -38,7 +38,7 @@
 └─────────────────────────────────────────────────────────────────┘
 ```
 
-## Features
+## Võimalused
 
 - **Event-driven architecture** using RabbitMQ message queues
 - **Retry policies** with exponential backoff
@@ -52,7 +52,7 @@
 - **Kubernetes deployment** with Helm charts
 - **Priority queues** for critical notifications
 
-## Technology Stack
+## Tehnoloogiakomplekt
 
 - **Java 17** with Spring Boot 3.x
 - **RabbitMQ** for message queuing
@@ -63,16 +63,16 @@
 - **Resql** for data persistence
 - **Kubernetes** with Helm for deployment
 
-## Quick Start
+## Kiir algus
 
-### Prerequisites
+### Eeltingimused
 
 - Docker and Docker Compose
 - Java 17
 - Maven 3.x
 - Access to RabbitMQ, TIM, Resql, OpenSearch
 
-### Local Development
+### Kohalik arendus
 
 ```bash
 # Clone the repository
@@ -88,7 +88,7 @@ docker-compose up -d
 mvn spring-boot:run
 ```
 
-### Configuration
+### Konfiguratsioon
 
 Edit `src/main/resources/application.yml`:
 
@@ -104,7 +104,7 @@ rabbitmq:
   password: guest
 ```
 
-## Directory Structure
+## Kataloogi struktuur
 
 ```
 Email-Notification-System/
@@ -164,9 +164,9 @@ Email-Notification-System/
 └── README.md
 ```
 
-## Usage
+## Kasutamine
 
-### Sending an Email via API
+### E-kirja saatmine API kaudu
 
 ```bash
 curl -X POST http://localhost:8085/email/send \
@@ -187,11 +187,11 @@ curl -X POST http://localhost:8085/email/send \
   }'
 ```
 
-### Sending via Ruuter DSL
+### Saatmine Ruuter DSLi kaudu
 
 See `DSL/Ruuter.private/email/POST/` for workflow examples.
 
-## Event Types
+## Sündmuste tüübid
 
 | Event Type | Template | Priority | Description |
 |------------|----------|----------|-------------|
@@ -201,7 +201,7 @@ See `DSL/Ruuter.private/email/POST/` for workflow examples.
 | `system_alert` | system-alert | critical | System alert notifications |
 | `daily_digest` | daily-summary | low | Daily digest emails |
 
-## Monitoring
+## Monitooring
 
 ### Metrics Endpoint
 
@@ -223,9 +223,9 @@ http://localhost:8085/actuator/prometheus
 http://localhost:8085/actuator/health
 ```
 
-## Deployment
+## Juurutamine
 
-### Kubernetes with Helm
+### Kubernetesiga ja Helmiga
 
 ```bash
 # Install Helm chart
@@ -246,7 +246,7 @@ helm uninstall email-notification --namespace buerokratt
 
 See `docs/DEPLOYMENT.md` for complete environment variable reference.
 
-## Testing
+## Testimine
 
 ```bash
 # Unit tests
@@ -259,14 +259,14 @@ mvn verify
 mvn gatling:test
 ```
 
-## Documentation
+## Dokumentatsioon
 
-- [Architecture](docs/ARCHITECTURE.md) - Detailed system architecture
+- [Arhitektuur](docs/ARCHITECTURE.md) - Detailed system architecture
 - [API Reference](docs/API.md) - REST API documentation
-- [Monitoring](docs/MONITORING.md) - Monitoring and alerting setup
-- [Deployment](docs/DEPLOYMENT.md) - Deployment guide
+- [Monitooring](docs/MONITORING.md) - Monitoring and alerting setup
+- [Juurutamine](docs/DEPLOYMENT.md) - Deployment guide
 
-## Security
+## Turvalisus
 
 - JWT authentication via TIM
 - Rate limiting per API key

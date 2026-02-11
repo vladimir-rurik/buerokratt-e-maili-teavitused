@@ -1,137 +1,137 @@
-# Email Notification System - Complete Solution
+# E-posti Teavitussüsteem - Täielik Lahendus
 
-## Overview
+## Ülevaade
 
-A production-ready, event-driven email notification system for the Bürokraatt ecosystem following Bükstack DSL architecture principles.
+Tootmisvalmis, sündmustepõhine e-posti teavitussüsteem Bürokraadi ökosüsteemile, järgides Bükstack DSL arhitektuuri põhimõtteid.
 
-## Architecture Compliance
+## Arhitektuuri vastavus
 
-### Bükstack DSL Architecture Principles
+### Bükstack DSL arhitektuuri põhimõtted
 
-**Implementation:**
-- Ruuter DSL workflows for email orchestration (`DSL/Ruuter.private/email/POST/`)
-- YAML-based workflow definitions
-- Integration with existing Bükstack components (TIM, Resql, CronManager)
-- REST API endpoints exposed via Ruuter
-- Configuration via constants and environment variables
+**Realisatsioon:**
+- Ruuter DSL töövoogude e-kirja orkestreerimiseks (`DSL/Ruuter.private/email/POST/`)
+- YAML-põhised töövoogu definitsioonid
+- Integratsioon olemasolevate Bükstack komponentidega (TIM, Resql, CronManager)
+- REST API otspunktid on avatud Ruuteri kaudu
+- Konfiguratsioon konstantide ja keskkonnamuutujate kaudu
 
-**DSL Examples:**
-- `send-welcome-email.yml` - User registration flow
-- `send-password-reset.yml` - Password reset flow
-- `send-chat-transfer-notification.yml` - Chat notification flow
+**DSL näited:**
+- `send-welcome-email.yml` - Kasutaja registreerimise voog
+- `send-password-reset.yml` - Parooli lähtestamise voog
+- `send-chat-transfer-notification.yml` - VestlusTeavituse voog
 
-### Event-Driven, Reliable, Scalable
+### Sündmustepõhine, usaldusväärne, skaleeritav
 
 **Event Bus:** RabbitMQ
-- Primary queue: `email.notifications`
+- Peamine järjekord: `email.notifications`
 - Dead Letter Queue: `email.dlq`
 - Retry queue: `email.retry`
-- Message TTL: 5 minutes (normal), 24 hours (DLQ)
+- Message TTL: 5 minutit (normaalne), 24 tundi (DLQ)
 
-**Retry Policies:**
-- Exponential backoff: 2^n seconds (max 60s)
-- Priority-based limits:
-  - Critical: 5 retries
-  - High: 3 retries
-  - Normal: 2 retries
-  - Low: 1 retry
+**Korduskatse poliitikad:**
+- Exponential backoff: 2^n sekundit (maks 60s)
+- Prioriteedipõhised piirangud:
+  - Critical: 5 korduskatset
+  - High: 3 korduskatset
+  - Normal: 2 korduskatset
+  - Low: 1 korduskatse
 
-**Queue Configuration:**
-- Durable queues
-- Persistent messages
-- Priority queues supported
-- Publisher confirms enabled
+**Järjekorra konfiguratsioon:**
+- Püsivad järjekorrad
+- Püsivad sõnumid
+- Prioriteetsete järjekorrade tugi
+- Publisher confirms lubatud
 
-**Scalability:**
-- Horizontal scaling via Kubernetes HPA (3-10 replicas)
-- Worker pool: 5-20 concurrent consumers
+**Skaleeritavus:**
+- Horisontaalne skaleerimine Kubernetes HPA kaudu (3-10 replikat)
+- Worker pool: 5-20 üheaegselt tarbijat
 - Connection pooling
-- Async processing
+- Asünkroonne töötlus
 
-### Logging and Error Tracking
+### Logimine ja veajälgimine
 
-**Structured Logging:**
-- JSON format logs to OpenSearch
-- Event tracking from request to delivery
-- Error details with stack traces
-- Performance metrics included
+**Struktureeritud logimine:**
+- JSON formaadi logid OpenSearchis
+- Sündmuste jälgimine päringust kohaletoimetamiseni
+* Veadetailid koos stack trace'idega
+- Jõudlusmõõdikud kaasatud
 
-**Distributed Tracing:**
-- OpenTelemetry integration
-- Trace ID propagation
-- Request correlation
-- Performance analysis
+**Distributed tracing:**
+- OpenTelemetry integratsioon
+- Trace ID edastus
+- Päringu korrelatsioon
+- Jõudlusanalüüs
 
-**Metrics (Prometheus):**
-- `email_sent_total` - Total sent emails
-- `email_failed_total` - Total failures
-- `email_retry_total` - Retry attempts
-- `email_send_duration_seconds` - Send duration (p50, p95, p99)
-- `email_queue_size` - Queue depth
+**Mõõdikud (Prometheus):**
+- `email_sent_total` - Saadetud e-kirjad kokku
+- `email_failed_total` - Nurjunud kokku
+- `email_retry_total` - Korduskatsed
+- `email_send_duration_seconds` - Saatmise kestus (p50, p95, p99)
+- `email_queue_size` - Järjekorra sügavus
 
-**Error Tracking:**
-- DLQ monitoring
-- Failed message details
-- Error categorization
-- Retry tracking
+**Veajälgimine:**
+- DLQ monitooring
+- Nurjunud sõnumite detailid
+- Vea kategoriseerimine
+- Korduskatsete jälgimine
 
-### Ecosystem Integration
+### Ökosüsteemi integratsioon
 
-**TIM Integration:**
-- JWT authentication and validation
-- Token verification via JWKS endpoint
-- Scope-based authorization
-- Security configuration
+**TIM integratsioon:**
+- JWT autentimine ja valideerimine
+- Tokeni verifitseerimine JWKS otspunkti kaudu
+- Scope-põhine autoriseerimine
+- Turvakonfiguratsioon
 
-**Resql Integration:**
-- Email delivery tracking table
-- Template storage
-- User preferences
-- Stored procedures for logging
+**Resql integratsioon:**
+- E-kirja kohaletoimetamise jälgimise tabel
+- Mallide salvestamine
+- Kasutajaeelistused
+- Salvestatud protseduurid logimiseks
 
-**CronManager Integration:**
-- Retry queue processing (every 5 min)
-- Old record cleanup (daily at 2 AM)
-- Daily digest generation (daily at 8 AM)
-- DLQ monitoring (every 10 min)
-- Template cache refresh (hourly)
+**CronManager integratsioon:**
+- Retry queue töötlus (iga 5 min)
+- Vanade kirjete puhastus (iga päev kell 2 AM)
+- Igapäevase kokkuvõtte genereerimine (iga päev kell 8 AM)
+- DLQ monitooring (iga 10 min)
+- Malli vahemälu värskendus (iga tund)
 
-**Ruuter Integration:**
-- DSL workflows for email triggers
-- HTTP POST to email service
-- Response handling
-- Error propagation
+**Ruuter integratsioon:**
+- DSL töövoogud e-kirja päästikuteks
+- HTTP POST e-posti teenusele
+- Vastuse käitlemine
+- Vea edastus
 
-### Code Implementation
+### Koodi realisatsioon
 
-**Email Providers:**
+**E-posti teenusepakkujad:**
 1. **SMTP** (`SmtpEmailProvider.java`)
    - JavaMail API
-   - StartTLS support
+   - StartTLS tugi
    - Connection pooling
-   - Timeout configuration
+   - Timeout konfiguratsioon
 
-2. **AWS SES** (Architecture defined)
+2. **AWS SES** (Arhitektuur defineeritud)
    - AWS SDK v2
    - Signature V4
-   - Region configuration
+   - Region konfiguratsioon
 
-3. **SendGrid** (Architecture defined)
+3. **SendGrid** (Arhitektuur defineeritud)
    - SendGrid Java SDK
-   - API key authentication
-   - Template support
+   - API võtme autentimine
+   - Mallide tugi
 
-**Code Quality:**
-- Java 17 with Spring Boot 3.x
-- Lombok for reduced boilerplate
+**Koodi kvaliteet:**
+- Java 17 koos Spring Boot 3.x
+- Lombok vähema boilerplate'i jaoks
 - Dependency injection
-- Configuration externalization
-- Exception handling
-- Input validation (Jakarta Validation)
-- Resource cleanup
+- Konfiguratsiooni välisistamine
+- Erandite käitlemine
+- Sisendi valideerimine (Jakarta Validation)
+- Ressursside puhastamine
 - Thread safety
 
-## Directory Structure
+## Kataloogi struktuur
 
 ```
 Email-Notification-System/
@@ -189,9 +189,9 @@ Email-Notification-System/
         └── application-dev.yml
 ```
 
-## Key Features
+## Põhivõimalused
 
-### Functional Features
+### Funktsionaalsed võimalused
 - Multiple email providers (SMTP, SES, SendGrid)
 - Template engine (Handlebars)
 - Multi-language support (et, en, ru)
@@ -203,7 +203,7 @@ Email-Notification-System/
 - Delivery tracking
 - Status API
 
-### Non-Functional Features
+### Mittefunktsionaalsed võimalused
 - JWT authentication
 - Rate limiting
 - Input validation
@@ -217,7 +217,7 @@ Email-Notification-System/
 - Graceful shutdown
 - Horizontal scaling
 
-## API Endpoints
+## API otspunktid
 
 | Method | Endpoint                     | Description                |
 |--------|------------------------------|----------------------------|
@@ -230,7 +230,7 @@ Email-Notification-System/
 | GET    | /actuator/prometheus         | Prometheus metrics         |
 | GET    | /actuator/health             | Detailed health            |
 
-## Event Types Supported
+## Toetatud sündmuste tüübid
 
 | Event Type          | Template                    | Priority | Use Case                    |
 |---------------------|-----------------------------|----------|-----------------------------|
@@ -240,7 +240,7 @@ Email-Notification-System/
 | system_alert        | system-alert                | critical | System alerts               |
 | daily_digest        | daily-summary               | low      | Daily digest emails         |
 
-## Configuration Examples
+## Konfiguratsiooni näited
 
 ### Application Properties
 ```yaml
@@ -280,16 +280,16 @@ autoscaling:
   targetCPUUtilizationPercentage: 70
 ```
 
-## Monitoring Setup
+## Monitoeringu seadistamine
 
-### Prometheus Alerts
+### Prometheus häired
 - High failure rate (>10%)
 - Service down
 - Queue backlog (>1000)
 - DLQ growth
 - High latency (p95 > 10s)
 
-### Grafana Dashboard
+### Grafana armatuurlaud
 - Emails sent per second
 - Success rate percentage
 - Queue size over time
@@ -297,7 +297,7 @@ autoscaling:
 - Failures by event type
 - Retry rate
 
-### Log Patterns
+### Logimustri mustrid
 ```json
 {
   "event_type": "email_sent",
@@ -308,15 +308,15 @@ autoscaling:
 }
 ```
 
-## Deployment Steps
+## Juurutamise sammud
 
-1. **Prerequisites**
+1. **Eeltingimused**
    - Kubernetes cluster
    - PostgreSQL database
    - RabbitMQ instance
    - Redis cache
 
-2. **Database Setup**
+2. **Andmebaasi seadistamine**
    ```bash
    psql -f database/schema.sql
    ```
@@ -338,9 +338,9 @@ autoscaling:
    curl http://email-service/actuator/health
    ```
 
-## Testing
+## Testimine
 
-### Manual Testing
+### Käsitsi testimine
 ```bash
 # Send test email
 curl -X POST http://localhost:8085/email/send \
@@ -352,13 +352,13 @@ curl -X POST http://localhost:8085/email/send \
   }'
 ```
 
-### Load Testing
+### Koormusetestimine
 ```bash
 # Gatling tests
 mvn gatling:test
 ```
 
-## Performance Targets
+## Jõudlus eesmärgid
 
 | Metric              | Target | Alert          |
 |---------------------|--------|----------------|
