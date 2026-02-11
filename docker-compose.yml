@@ -1,0 +1,71 @@
+version: "3.9"
+
+services:
+  email-notification-service:
+    container_name: email-notification
+    image: buerokratt/email-notification-service:latest
+    environment:
+      - ENVIRONMENT=production
+      - EMAIL_PROVIDER=smtp
+      - EMAIL_FROM=noreply@buerokratt.ee
+      - EMAIL_REPLY_TO=support@buerokratt.ee
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USERNAME}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - SMTP_AUTH=true
+      - SMTP_STARTTLS=true
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USERNAME=${RABBITMQ_USERNAME}
+      - RABBITMQ_PASSWORD=${RABBITMQ_PASSWORD}
+      - TIM_URL=http://tim:8083
+      - RESQL_URL=http://resql:8082
+      - OPENSEARCH_URL=http://opensearch:9200
+      - LOG_LEVEL_ROOT=INFO
+      - LOG_LEVEL_APP=WARN
+      - SECURITY_DISABLED=false
+    volumes:
+      - ./DSL:/DSL:ro
+    ports:
+      - "8085:8085"
+    networks:
+      - bykstack
+    depends_on:
+      - rabbitmq
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8085/actuator/health"]
+      interval: 30s
+      timeout: 3s
+      retries: 3
+      start_period: 60s
+
+  # RabbitMQ is expected to be running in the existing Bürokraat infrastructure
+  # This is provided for development/testing only
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: email-rabbitmq
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USERNAME:-guest}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASSWORD:-guest}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - bykstack
+    volumes:
+      - rabbitmq-data:/var/lib/rabbitmq
+    healthcheck:
+      test: ["CMD", "rabbitmq-diagnostics", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+volumes:
+  rabbitmq-data:
+
+networks:
+  bykstack:
+    name: bykstack
+    external: true

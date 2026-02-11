@@ -1,0 +1,82 @@
+declaration:
+  call: declare
+  version: 1.0
+  description: "Send notification when chat is transferred to human agent"
+  method: post
+  accepts: json
+  returns: json
+  namespace: email
+  allowlist:
+    body:
+      - field: chatId
+        type: string
+        description: "Chat ID"
+      - field: agentEmail
+        type: string
+        description: "Agent email"
+      - field: agentName
+        type: string
+        description: "Agent name"
+      - field: customerName
+        type: string
+        description: "Customer name"
+      - field: messageCount
+        type: integer
+        description: "Number of messages in chat"
+
+extract_data:
+  assign:
+    chatId: ${incoming.body.chatId}
+    agentEmail: ${incoming.body.agentEmail}
+    agentName: ${incoming.body.agentName}
+    customerName: ${incoming.body.customerName ?? 'Klient'}
+    messageCount: ${incoming.body.messageCount ?? 0}
+  next: get_chat_details
+
+get_chat_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-chat-messages"
+    body:
+      chatId: ${chatId}
+  result: chat_details
+  next: prepare_email
+
+prepare_email:
+  assign:
+    emailRequest:
+      eventId: ${java.util.UUID.randomUUID().toString()}
+      eventType: "chat_transferred"
+      recipientEmail: ${agentEmail}
+      recipientName: ${agentName}
+      templateId: "chat-transfer-notification"
+      priority: "normal"
+      locale: "et"
+      templateData:
+        chatId: ${chatId}
+        agentName: ${agentName}
+        customerName: ${customerName}
+        messageCount: ${chat_details.response.body?.length ?? messageCount}
+        chatUrl: "[#BACKOFFICE_URL]/chat/${chatId}"
+        transferTime: ${new Date().toISOString()}
+  next: send_email
+
+send_email:
+  call: http.post
+  args:
+    url: "[#EMAIL_NOTIFICATION_SERVICE]/email/send"
+    body: ${emailRequest}
+  result: email_result
+  next: return_success
+
+return_success:
+  return:
+    messageId: ${email_result.response.body.messageId}
+    status: ${email_result.response.body.status}
+  next: end
+
+error_handler:
+  status: 500
+  return:
+    error: "Failed to send chat transfer notification"
+  next: end

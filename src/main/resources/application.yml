@@ -1,0 +1,139 @@
+spring:
+  application:
+    name: email-notification-service
+  profiles:
+    active: ${ENVIRONMENT:development}
+
+server:
+  port: 8085
+
+# Email Provider Configuration
+email:
+  provider: ${EMAIL_PROVIDER:smtp}  # smtp, ses, sendgrid
+  from: ${EMAIL_FROM:noreply@buerokratt.ee}
+  reply-to: ${EMAIL_REPLY_TO:support@buerokratt.ee}
+  idempotency:
+    enabled: ${EMAIL_IDEMPOTENCY_ENABLED:true}
+  worker:
+    enabled: ${EMAIL_WORKER_ENABLED:true}
+  default-locale: ${EMAIL_DEFAULT_LOCALE:et}
+
+  # SMTP Configuration
+  smtp:
+    host: ${SMTP_HOST:smtp.example.com}
+    port: ${SMTP_PORT:587}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    auth: ${SMTP_AUTH:true}
+    starttls: ${SMTP_STARTTLS:true}
+    from: ${SMTP_FROM:}
+    debug: ${SMTP_DEBUG:false}
+
+  # AWS SES Configuration
+  aws:
+    region: ${AWS_REGION:eu-north-1}
+    ses:
+      access-key: ${AWS_SES_ACCESS_KEY:}
+      secret-key: ${AWS_SES_SECRET_KEY:}
+
+  # SendGrid Configuration
+  sendgrid:
+    api-key: ${SENDGRID_API_KEY:}
+
+  # Retry Configuration
+  retry:
+    max-critical: ${EMAIL_RETRY_MAX_CRITICAL:5}
+    max-high: ${EMAIL_RETRY_MAX_HIGH:3}
+    max-normal: ${EMAIL_RETRY_MAX_NORMAL:2}
+    max-low: ${EMAIL_RETRY_MAX_LOW:1}
+
+# RabbitMQ Configuration
+rabbitmq:
+  host: ${RABBITMQ_HOST:rabbitmq}
+  port: ${RABBITMQ_PORT:5672}
+  username: ${RABBITMQ_USERNAME:guest}
+  password: ${RABBITMQ_PASSWORD:guest}
+  email:
+    queue:
+      ttl: ${RABBITMQ_QUEUE_TTL:300000}  # 5 minutes
+    dlq:
+      ttl: ${RABBITMQ_DLQ_TTL:86400000}  # 24 hours
+
+# TIM Integration
+tim:
+  url: ${TIM_URL:http://tim:8083}
+
+# Resql Integration
+resql:
+  url: ${RESQL_URL:http://resql:8082}
+
+# OpenSearch Logging
+opensearch:
+  url: ${OPENSEARCH_URL:http://opensearch:9200}
+  index: ${OPENSEARCH_INDEX:email-notifications}
+  enabled: ${OPENSEARCH_ENABLED:true}
+
+# Prometheus Metrics
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus,metrics
+      base-path: /actuator
+  metrics:
+    export:
+      prometheus:
+        enabled: true
+    tags:
+      application: ${spring.application.name}
+      environment: ${ENVIRONMENT:development}
+      region: ${REGION:default}
+
+  # Health Checks
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+
+  # Tracing
+  tracing:
+    sampling:
+      probability: ${TRACING_SAMPLING_PROBABILITY:1.0}
+
+# Logging
+logging:
+  level:
+    root: ${LOG_LEVEL_ROOT:INFO}
+    ee.buerokratt.email: ${LOG_LEVEL_APP:DEBUG}
+    org.springframework.amqp: ${LOG_LEVEL_AMQP:INFO}
+    org.springframework.security: ${LOG_LEVEL_SECURITY:INFO}
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} ${LOG_LEVEL_PATTERN:-%5p} [%t] %-40.40logger{39} : %m%n${LOG_EXCEPTION_CONVERSION_WORD:%wEx}"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: ${LOG_FILE:/var/log/email-notification-service/application.log}
+    max-size: 100MB
+    max-history: 30
+
+# Cache Configuration
+spring.cache:
+  type: redis
+  redis:
+    time-to-live: 3600000  # 1 hour
+
+# Redis Configuration
+spring.data.redis:
+  host: ${REDIS_HOST:redis}
+  port: ${REDIS_PORT:6379}
+  password: ${REDIS_PASSWORD:}
+  timeout: 2000ms
+  lettuce:
+    pool:
+      max-active: 8
+      max-idle: 8
+      min-idle: 0
+
+# Security
+security:
+  disabled: ${SECURITY_DISABLED:false}

@@ -1,0 +1,18 @@
+# Development Profile Configuration
+
+spring:
+  profiles: development
+
+logging:
+  level:
+    root: DEBUG
+    ee.buerokratt.email: DEBUG
+    org.springframework.amqp: DEBUG
+    org.springframework.security: DEBUG
+
+email:
+  idempotency:
+    enabled: false
+
+security:
+  disabled: true

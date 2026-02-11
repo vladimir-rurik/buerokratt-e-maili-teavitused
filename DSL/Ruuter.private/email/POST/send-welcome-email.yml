@@ -1,0 +1,89 @@
+declaration:
+  call: declare
+  version: 1.0
+  description: "Send welcome email to new user"
+  method: post
+  accepts: json
+  returns: json
+  namespace: email
+  allowlist:
+    body:
+      - field: userId
+        type: string
+        description: "User ID"
+      - field: email
+        type: string
+        description: "User email"
+      - field: name
+        type: string
+        description: "User name"
+      - field: locale
+        type: string
+        description: "User locale (et, en, ru)"
+
+extract_user_data:
+  assign:
+    userId: ${incoming.body.userId}
+    email: ${incoming.body.email}
+    name: ${incoming.body.name}
+    locale: ${incoming.body.locale ?? 'et'}
+  next: get_user_details
+
+get_user_details:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/get-user-details"
+    body:
+      userId: ${userId}
+  result: user_details
+  next: prepare_email_request
+
+prepare_email_request:
+  assign:
+    emailRequest:
+      eventId: ${java.util.UUID.randomUUID().toString()}
+      eventType: "user_registration"
+      recipientEmail: ${email}
+      recipientName: ${name}
+      templateId: "welcome-email"
+      priority: "normal"
+      locale: ${locale}
+      templateData:
+        userId: ${userId}
+        name: ${name}
+        confirmationUrl: "[#BASE_URL]/confirm-email?token=${user_details.response.body[0]?.confirmationToken ?? ''}"
+  next: send_email
+
+send_email:
+  call: http.post
+  args:
+    url: "[#EMAIL_NOTIFICATION_SERVICE]/email/send"
+    headers:
+      X-JWT-Assertion: ${incoming.headers['X-JWT-Assertion']}
+    body: ${emailRequest}
+  result: email_result
+  next: log_email_sent
+
+log_email_sent:
+  call: http.post
+  args:
+    url: "[#CHATBOT_RESQL]/log-email-sent"
+    body:
+      eventId: ${emailRequest.eventId}
+      userId: ${userId}
+      status: "queued"
+      timestamp: ${new Date().toISOString()}
+  result: log_result
+  next: return_success
+
+return_success:
+  return:
+    messageId: ${email_result.response.body.messageId}
+    status: ${email_result.response.body.status}
+  next: end
+
+error_handler:
+  status: 500
+  return:
+    error: "Failed to send welcome email"
+  next: end

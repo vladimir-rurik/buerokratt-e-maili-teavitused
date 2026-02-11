@@ -1,0 +1,13 @@
+apiVersion: v2
+name: email-notification-service
+description: Email Notification Service for Bürokraatt
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - email
+  - notification
+  - buerokratt
+maintainers:
+  - name: Bürokraatt Team
+    email: dev@buerokratt.ee

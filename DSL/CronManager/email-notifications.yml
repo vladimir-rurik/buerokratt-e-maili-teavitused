@@ -1,0 +1,44 @@
+# Email Notification Cron Jobs
+# These jobs are managed by CronManager and scheduled for automated tasks
+
+# Process retry queue - runs every 5 minutes
+process_retry_queue:
+  trigger: "0 */5 * * * ?"
+  type: http
+  method: POST
+  url: "[#EMAIL_NOTIFICATION_SERVICE]/email/process-retry-queue"
+  allowedEnvs: []
+
+# Cleanup old delivery records - runs daily at 2 AM
+cleanup_old_emails:
+  trigger: "0 0 2 * * ?"
+  type: http
+  method: POST
+  url: "[#EMAIL_NOTIFICATION_SERVICE]/email/cleanup"
+  body:
+    olderThanDays: 30
+  allowedEnvs: []
+
+# Generate daily digest - runs daily at 8 AM
+generate_daily_digest:
+  trigger: "0 0 8 * * ?"
+  type: http
+  method: POST
+  url: "[#EMAIL_NOTIFICATION_SERVICE]/email/generate-digest"
+  allowedEnvs: []
+
+# Check DLQ for issues - runs every 10 minutes
+check_dlq_alerts:
+  trigger: "0 */10 * * * ?"
+  type: http
+  method: POST
+  url: "[#EMAIL_NOTIFICATION_SERVICE]/email/check-dlq"
+  allowedEnvs: []
+
+# Clear template cache - runs hourly
+refresh_templates:
+  trigger: "0 0 * * * ?"
+  type: http
+  method: POST
+  url: "[#EMAIL_NOTIFICATION_SERVICE]/email/refresh-templates"
+  allowedEnvs: []

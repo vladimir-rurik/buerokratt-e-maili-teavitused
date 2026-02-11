@@ -1,0 +1,141 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "email-notification-service.fullname" . }}
+  labels:
+    {{- include "email-notification-service.labels" . | nindent 4 }}
+spec:
+  {{- if not .Values.autoscaling.enabled }}
+  replicas: {{ .Values.replicaCount }}
+  {{- end }}
+  selector:
+    matchLabels:
+      {{- include "email-notification-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+        {{- with .Values.podAnnotations }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+      labels:
+        {{- include "email-notification-service.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "email-notification-service.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+      - name: {{ .Chart.Name }}
+        securityContext:
+          {{- toYaml .Values.securityContext | nindent 12 }}
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - name: http
+          containerPort: 8085
+          protocol: TCP
+        - name: management
+          containerPort: 8086
+          protocol: TCP
+        env:
+        - name: ENVIRONMENT
+          value: {{ .Values.environment }}
+        - name: EMAIL_PROVIDER
+          value: {{ .Values.email.provider }}
+        - name: EMAIL_FROM
+          value: {{ .Values.email.from }}
+        - name: EMAIL_REPLY_TO
+          value: {{ .Values.email.replyTo }}
+        - name: EMAIL_IDEMPOTENCY_ENABLED
+          value: {{ .Values.email.idempotency.enabled | quote }}
+        - name: EMAIL_WORKER_ENABLED
+          value: {{ .Values.email.worker.enabled | quote }}
+        - name: EMAIL_DEFAULT_LOCALE
+          value: {{ .Values.email.defaultLocale }}
+        - name: SMTP_HOST
+          value: {{ .Values.email.smtp.host }}
+        - name: SMTP_PORT
+          value: {{ .Values.email.smtp.port | quote }}
+        - name: SMTP_AUTH
+          value: {{ .Values.email.smtp.auth | quote }}
+        - name: SMTP_STARTTLS
+          value: {{ .Values.email.smtp.starttls | quote }}
+        - name: SMTP_DEBUG
+          value: {{ .Values.email.smtp.debug | quote }}
+        - name: RABBITMQ_HOST
+          value: {{ .Values.rabbitmq.host }}
+        - name: RABBITMQ_PORT
+          value: {{ .Values.rabbitmq.port | quote }}
+        - name: RABBITMQ_USERNAME
+          value: {{ .Values.rabbitmq.username }}
+        - name: RABBITMQ_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: {{ .Values.rabbitmq.existingSecret | default "rabbitmq-secret" }}
+              key: password
+        - name: TIM_URL
+          value: {{ .Values.tim.url }}:{{ .Values.tim.port }}
+        - name: RESQL_URL
+          value: {{ .Values.resql.url }}:{{ .Values.resql.port }}
+        - name: OPENSEARCH_URL
+          value: {{ .Values.opensearch.url }}:{{ .Values.opensearch.port }}
+        - name: REDIS_HOST
+          value: {{ .Values.redis.host }}
+        - name: REDIS_PORT
+          value: {{ .Values.redis.port | quote }}
+        - name: LOG_LEVEL_ROOT
+          value: {{ .Values.logging.levelRoot }}
+        - name: LOG_LEVEL_APP
+          value: {{ .Values.logging.levelApp }}
+        - name: LOG_LEVEL_AMQP
+          value: {{ .Values.logging.levelAmqp }}
+        - name: LOG_LEVEL_SECURITY
+          value: {{ .Values.logging.levelSecurity }}
+        - name: SECURITY_DISABLED
+          value: "false"
+        - name: EMAIL_RETRY_MAX_CRITICAL
+          value: {{ .Values.email.retry.maxCritical | quote }}
+        - name: EMAIL_RETRY_MAX_HIGH
+          value: {{ .Values.email.retry.maxHigh | quote }}
+        - name: EMAIL_RETRY_MAX_NORMAL
+          value: {{ .Values.email.retry.maxNormal | quote }}
+        - name: EMAIL_RETRY_MAX_LOW
+          value: {{ .Values.email.retry.maxLow | quote }}
+        {{- with .Values.envFrom }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        volumeMounts:
+        - name: dsl
+          mountPath: /DSL
+        {{- with .Values.volumeMounts }}
+        {{- toYaml . | nindent 8 }}
+        {{- end }}
+        livenessProbe:
+          {{- toYaml .Values.livenessProbe | nindent 12 }}
+        readinessProbe:
+          {{- toYaml .Values.readinessProbe | nindent 12 }}
+        resources:
+          {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+      - name: dsl
+        configMap:
+          name: email-notification-dsl
+      {{- with .Values.volumes }}
+      {{- toYaml . | nindent 6 }}
+      {{- end }}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
